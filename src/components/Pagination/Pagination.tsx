@@ -13,7 +13,7 @@ const Pagination = observer((): ReactElement => {
         setNumbers(
             setNumberPagesArray(rootStore.pages.current, rootStore.pages.total)
         );
-    }, [rootStore.pages.current]);
+    }, [rootStore.pages.current, rootStore.deleteMeterInfo]);
 
     return (
         <div className="Pagination">

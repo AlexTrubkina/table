@@ -16,7 +16,7 @@ export const PaginationButton = ({
         <button
             className={"Pagination-Button" + (+number === rootStore.pages.current ? " Pagination-Button_Active" : "")}
             onClick={() => onPaginationClick(number)}
-            disabled={number === "..." ? true : false}
+            disabled={number === "..."}
         >
             {number}
         </button>
