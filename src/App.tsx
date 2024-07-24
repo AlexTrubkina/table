@@ -1,4 +1,4 @@
-import './App.css'
+import './App.scss'
 import Table from '@components/Table/Table'
 import Title from './components/Title/Title'
 
