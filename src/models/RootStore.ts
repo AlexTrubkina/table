@@ -1,6 +1,7 @@
-import {Instance, t} from 'mobx-state-tree'
-import { MeterModel } from './MeterModel'
+import {Instance, flow, t} from 'mobx-state-tree'
+import { MeterModel, Pages } from './MeterModel'
 import { AddressModel } from './AddressModel'
+import { getAddress, getMeters } from '@/api/requests'
 
 interface Meter {
     id: string
@@ -33,18 +34,40 @@ interface Address {
 export const RootStore = t.model('RootStore', {
     meters: t.array(MeterModel),
     addresses: t.array(AddressModel),
-}).actions((store) => ({
-    setMeters(meters: Meter[]) {
-        meters.forEach(meter => store.meters.push(
-            MeterModel.create(meter)
-        ));
-    },
-    setAddresses(addresses: Address[]) {
-        addresses.forEach(address => store.addresses.push(
-            AddressModel.create(address)
-        ))
+    pages: Pages
+}).actions((store) => {
+    const setMeters = flow(function*(page: number) {
+        try {
+            const offset = String(20 * page)
+            const meters = yield getMeters(offset);
+            store.meters.splice(0, store.meters.length);
+            meters.results.forEach((meter: Meter) => store.meters.push(
+                MeterModel.create(meter)
+            ));
+            store.pages.current = page;
+            store.pages.total = Math.floor(meters.count / 20);
+            console.log(store.pages.total);
+            
+        } catch (e) {
+            console.log(e)
+        }
+        
+    })
+    const setAddresses =  flow(function*() {
+        try {
+            const addresses = yield getAddress();
+            addresses.results.forEach((address: Address) => store.addresses.push(
+                AddressModel.create(address)
+            ))
+        } catch (error) {
+            console.log(error)
+        }
+    })
+    return {
+        setMeters,
+        setAddresses
     }
-}))
+})
 
 export type RootStoreType = Instance<typeof RootStore>
 
@@ -55,6 +78,10 @@ export const useRootStore = () => {
         rootStore = RootStore.create({
             meters: [],
             addresses: [],
+            pages: {
+                current: 0,
+                total: 0
+            }
         })
     }
     return rootStore
