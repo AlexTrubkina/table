@@ -1,9 +1,14 @@
 import './App.css'
 import Table from '@components/Table/Table'
+import Title from './components/Title/Title'
 
 function App() {
   return (
-    <Table />
+    <>
+      <Title text="Список счётчиков" />
+      <Table />
+    </>
+    
   )
 }
 
