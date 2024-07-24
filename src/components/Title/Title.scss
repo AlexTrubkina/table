@@ -1,8 +1,10 @@
+@use "@/App.scss" as *;
+
 .Title {
     font-weight: 500;
     font-size: 24px;
     line-height: 32px;
-    color: #1F2939;
+    color: $black;
     max-width: 1408px;
     width: 100%;
     display: inline-block;

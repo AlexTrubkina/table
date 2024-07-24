@@ -1,3 +1,5 @@
+@use "@/App.scss" as *;
+
 .Table {
     width: 100%;
     max-width: 1408px;
@@ -22,10 +24,17 @@
         text-align: start;
         background-color: #F8FAFC;
         border-bottom: 1px solid #E0E5EB;
-        color: #697180;
+        color: $grey500;
         font-weight: 500;
         font-size: 13px;
         padding: 8px 17px;
         border: 0;
+    }
+    &-Row {
+        &:hover {
+            .Button {
+                display: block;
+            }
+        }
     }
 }
