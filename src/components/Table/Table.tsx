@@ -1,9 +1,10 @@
 import { ReactElement, useEffect } from "react";
 import "./Table.scss";
-import { HotWaterIcon, WaterIcon } from "@/assets/icons";
+import { HotWaterIcon, WaterIcon, TrashIcon } from "@/assets/icons";
 import Pagination from "../Pagination/Pagination";
 import { useRootStore } from "@/models/RootStore";
 import {observer} from "mobx-react-lite";
+import Button from "../Button/Button";
 
 
 const Table = observer((): ReactElement => {
@@ -30,11 +31,13 @@ const Table = observer((): ReactElement => {
                         <th>Текущие показания</th>
                         <th>Адрес</th>
                         <th>Примечние</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody className="Table-Body">
+                    {rootStore.isLoading && <tr><td colSpan={8}>Загрузка...</td></tr>}
                     {rootStore.meters?.map((meter, index) => (
-                        <tr key={index}>
+                        <tr key={index} className="Table-Row">
                             <td>{index}</td>
                             <td>
                                 {meter._type[0] === "ColdWaterAreaMeter"
@@ -51,12 +54,16 @@ const Table = observer((): ReactElement => {
                                         : null
                                 )}
                             </td>
-                            <td>{meter.communication}</td>
+                            <td>{meter.description}</td>
+                            <td><Button meterId={meter.id} icon={<TrashIcon />} /></td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-            <Pagination/>
+            {
+                rootStore.pages.total > 1 && <Pagination />
+            }
+            
         </div>
     );
 });
