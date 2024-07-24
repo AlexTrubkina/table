@@ -8,7 +8,6 @@ function App() {
       <Title text="Список счётчиков" />
       <Table />
     </>
-    
   )
 }
 
