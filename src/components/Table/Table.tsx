@@ -1,7 +1,7 @@
 import { ReactElement, useEffect } from "react";
-import { getMeters, getAddress } from "@/api/requests";
 import "./Table.scss";
 import { HotWaterIcon, WaterIcon } from "@/assets/icons";
+import Pagination from "../Pagination/Pagination";
 import { useRootStore } from "@/models/RootStore";
 import {observer} from "mobx-react-lite";
 
@@ -10,10 +10,8 @@ const Table = observer((): ReactElement => {
 
     const rootStore = useRootStore();
     const getData = async () => {
-        const meters = await getMeters();
-        const address = await getAddress();
-        rootStore.setMeters(meters.results);
-        rootStore.setAddresses(address.results);
+        rootStore.setAddresses();
+        rootStore.setMeters(1);
     };
 
     useEffect(() => {
@@ -58,6 +56,7 @@ const Table = observer((): ReactElement => {
                     ))}
                 </tbody>
             </table>
+            <Pagination/>
         </div>
     );
 });
