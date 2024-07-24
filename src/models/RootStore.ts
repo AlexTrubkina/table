@@ -1,43 +1,18 @@
 import {Instance, flow, t} from 'mobx-state-tree'
 import { MeterModel, Pages } from './MeterModel'
 import { AddressModel } from './AddressModel'
-import { getAddress, getMeters } from '@/api/requests'
-
-interface Meter {
-    id: string
-    _type: string[]
-    area: {
-        id: string
-    }
-    is_automatic: boolean
-    communication: string
-    description: string
-    serial_number: string
-    installation_date: string
-    brand_name: string
-    model_name: string
-    initial_values: number[]
-}
-
-interface Address {
-    id: string
-    number: number
-    str_number: string
-    str_number_full: string
-    house: {
-        address: string
-        id: string
-        fias_addrobjs: string[]
-    }
-}
+import { deleteMeter, getAddress, getMeters } from '@/api/requests'
+import { Meter, Address } from '@/helpers/types'
 
 export const RootStore = t.model('RootStore', {
     meters: t.array(MeterModel),
     addresses: t.array(AddressModel),
-    pages: Pages
+    pages: Pages,
+    isLoading: t.boolean
 }).actions((store) => {
     const setMeters = flow(function*(page: number) {
         try {
+            store.isLoading = true
             const offset = String(20 * page)
             const meters = yield getMeters(offset);
             store.meters.splice(0, store.meters.length);
@@ -46,26 +21,42 @@ export const RootStore = t.model('RootStore', {
             ));
             store.pages.current = page;
             store.pages.total = Math.floor(meters.count / 20);
-            console.log(store.pages.total);
             
         } catch (e) {
             console.log(e)
+        } finally {
+            store.isLoading = false
         }
         
     })
     const setAddresses =  flow(function*() {
         try {
+            store.isLoading = true
             const addresses = yield getAddress();
             addresses.results.forEach((address: Address) => store.addresses.push(
                 AddressModel.create(address)
             ))
         } catch (error) {
             console.log(error)
+        } finally {
+            store.isLoading = false
+        }
+    })
+
+    const deleteMeterInfo = flow(function*(id: string) {
+        try {
+            store.isLoading = true
+            yield deleteMeter(id)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            store.isLoading = false
         }
     })
     return {
         setMeters,
-        setAddresses
+        setAddresses,
+        deleteMeterInfo
     }
 })
 
@@ -81,7 +72,8 @@ export const useRootStore = () => {
             pages: {
                 current: 0,
                 total: 0
-            }
+            },
+            isLoading: false
         })
     }
     return rootStore
